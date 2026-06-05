@@ -13,27 +13,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{
-  id Int @id @default(autoincrement())
+model User {
+  id        Int    @id @default(autoincrement())
   firstName String
-  lastName String
-  email String @unique
-  phone String 
-  password String
+  lastName  String
+  email     String @unique
+  phone     String
+  password  String
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
-model Jewelry{
-  id Int @id @default(autoincrement())
-  name String
-  price Int
+model Jewelry {
+  id          Int           @id @default(autoincrement())
+  name        String
+  price       Int
   description String
-  material String @default("Bạc S925")
-  stone String? 
-  status JewelryStatus @default(ACTIVE)
-  medias Media[]
+  material    String        @default("Bạc S925")
+  stone       String?
+  status      JewelryStatus @default(ACTIVE)
+  medias      Media[]
+
+  collectionId Int?
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+
   slug String @unique
 
   createdAt DateTime @default(now())
@@ -41,29 +45,45 @@ model Jewelry{
 
   @@index([status])
   @@index([createdAt])
+  @@index([collectionId])
 }
 
-model Media{
-  id Int @id @default(autoincrement())
-  url String
-  type MediaType
-  isThumbnail Boolean @default(false)
-  sortOrder Int @default(0)
+model Media {
+  id          Int       @id @default(autoincrement())
+  url         String
+  type        MediaType
+  isThumbnail Boolean   @default(false)
+  sortOrder   Int       @default(0)
 
-  jewelryId Int
-  jewelry Jewelry @relation(fields: [jewelryId], references: [id], onDelete: Cascade)
+  jewelryId Int?
+  jewelry   Jewelry? @relation(fields: [jewelryId], references: [id], onDelete: Cascade)
+
+  collectionId Int?
+  collection   Collection? @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
   @@index([jewelryId])
+  @@index([collectionId])
 }
 
-enum MediaType{
+model Collection {
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+
+  medias  Media[]
+  jewelry Jewelry[]
+
+  createdAt DateTime @default(now())
+}
+
+enum MediaType {
   IMAGE
   VIDEO
 }
 
-enum JewelryStatus{
+enum JewelryStatus {
   ACTIVE
   SOLD_OUT
   NEW_IN

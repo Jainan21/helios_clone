@@ -3,6 +3,17 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
+@font-face {
+  font-family: Helios;
+  src: url(./assets/fonts/Futura-PT-Medium.ttf);
+  font-weight: 400;
+  
+}
+
+body{
+  font-family: 'Helios';
+}
+
 .embla__viewport {
     overflow: hidden;
   }

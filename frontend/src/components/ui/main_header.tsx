@@ -1,10 +1,14 @@
-import { ChevronDown, Search, ShoppingBasket } from "lucide-react";
+import { ChevronDown, Search, ShoppingBasket } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '@/context/AuthContext'
 
 export default function MainHeader() {
+    const { user } = useAuth()
+
     return (
 
-        <div className="relative flex items-center w-full p-3 text-white hover:bg-black">
-            <div className="flex gap-2">
+        <div className="relative flex items-center w-full p-7 text-white transition-all ease-out duration-400 hover:bg-black">
+            <div className="flex gap-4">
                 <span className="flex items-center">
                     <p>MENU</p>
                 </span>
@@ -30,7 +34,15 @@ export default function MainHeader() {
                     <ChevronDown />
                 </span>
                 <span className="flex items-center gap-2">
-                    <p>Account</p>
+                    {user ? (
+                        <Link to="/account" className="font-medium text-white">
+                            Xin chào, {user.username}
+                        </Link>
+                    ) : (
+                        <Link to="/login" className="font-medium text-white">
+                            Account
+                        </Link>
+                    )}
                 </span>
                 <span>
                     <Search />
