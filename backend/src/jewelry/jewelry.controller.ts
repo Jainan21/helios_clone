@@ -23,16 +23,23 @@ export class JewelryController {
   @Get()
   findAll(
     @Query('status') status?: string,
+    @Query('type') type?: string,
     @Query('search') search?: string,
     @Query('page') page = '1',
     @Query('limit') limit = '20',
   ) {
     return this.jewelryService.findAll({
       status,
+      type,
       search,
       page: Number(page),
       limit: Number(limit),
     });
+  }
+
+  @Get('slug/:slug')
+  findBySlug(@Param('slug') slug: string) {
+    return this.jewelryService.findBySlug(slug);
   }
 
   @Get(':id')

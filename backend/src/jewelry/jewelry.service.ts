@@ -5,6 +5,12 @@ import { UpdateJewelryDto } from './dto/update-jewelry.dto';
 import { v2 as cloudinary } from 'cloudinary';
 import { PrismaService } from '../prisma/prisma.service';
 
+const mediaOrder = {
+  orderBy: {
+    sortOrder: 'asc' as const,
+  },
+};
+
 @Injectable()
 export class JewelryService {
   constructor(private prisma: PrismaService) {
@@ -20,10 +26,10 @@ export class JewelryService {
       where: {
         slug: dto.slug,
       },
-    })
+    });
 
     if (existed) {
-      throw new BadRequestException('Slug already exists')
+      throw new BadRequestException('Slug already exists');
     }
 
     return this.prisma.jewelry.create({
@@ -34,27 +40,28 @@ export class JewelryService {
         material: dto.material,
         stone: dto.stone,
         status: dto.status,
+        type: dto.type,
         slug: dto.slug,
-
-        medias: dto.medias ? {
-          create: dto.medias.map((media) => ({
-            url: media.url,
-            type: media.type,
-            isThumbnail: media.isThumbnail ?? false,
-            sortOrder: media.sortOrder ?? 0,
-          })),
-        } : undefined,
+        medias: dto.medias
+          ? {
+              create: dto.medias.map((media) => ({
+                url: media.url,
+                type: media.type,
+                isThumbnail: media.isThumbnail ?? false,
+                sortOrder: media.sortOrder ?? 0,
+              })),
+            }
+          : undefined,
       },
       include: {
-        medias: true,
+        medias: mediaOrder,
       },
-    })
-
+    });
   }
 
   async uploadMedia(file: any) {
     if (!file || !file.buffer) {
-      throw new BadRequestException('File is required for upload')
+      throw new BadRequestException('File is required for upload');
     }
 
     return new Promise<{ url: string }>((resolve, reject) => {
@@ -62,45 +69,51 @@ export class JewelryService {
         { folder: 'helios', resource_type: 'image' },
         (error, result) => {
           if (error) {
-            reject(new BadRequestException(error.message))
-            return
+            reject(new BadRequestException(error.message));
+            return;
           }
 
           if (!result?.secure_url) {
-            reject(new BadRequestException('Cloudinary upload failed'))
-            return
+            reject(new BadRequestException('Cloudinary upload failed'));
+            return;
           }
 
-          resolve({ url: result.secure_url })
+          resolve({ url: result.secure_url });
         },
-      )
+      );
 
-      uploadStream.end(file.buffer)
-    })
+      uploadStream.end(file.buffer);
+    });
   }
 
   async findAll(params: {
-    status?: string
-    search?: string
-    page: number
-    limit: number
+    status?: string;
+    type?: string;
+    search?: string;
+    page: number;
+    limit: number;
   }) {
-    const { status, search, page, limit } = params
-    const skip = (page - 1) * limit
+    const { status, type, search, page, limit } = params;
+    const skip = (page - 1) * limit;
     const where: any = {
       status: {
-        not: "HIDDEN"
-      }
-    }
+        not: 'HIDDEN',
+      },
+    };
+
     if (status) {
-      where.status = status
+      where.status = status;
+    }
+
+    if (type) {
+      where.type = type;
     }
 
     if (search) {
       where.name = {
         contains: search,
         mode: 'insensitive',
-      }
+      };
     }
 
     const [items, total] = await Promise.all([
@@ -114,6 +127,7 @@ export class JewelryService {
           material: true,
           stone: true,
           status: true,
+          type: true,
           slug: true,
           medias: {
             select: {
@@ -121,53 +135,100 @@ export class JewelryService {
               url: true,
               type: true,
               isThumbnail: true,
-              sortOrder: true
-            }
-          }
+              sortOrder: true,
+            },
+            orderBy: {
+              sortOrder: 'asc',
+            },
+          },
         },
         orderBy: {
-          createdAt: 'desc'
+          createdAt: 'desc',
         },
         skip,
-        take: limit
+        take: limit,
       }),
-
       this.prisma.jewelry.count({
         where,
       }),
-    ])
+    ]);
 
     return {
       data: items,
       pagination: {
-        total: total,
+        total,
         page,
         limit,
-        totalPage: Math.ceil(total / limit)
-      }
-    }
+        totalPage: Math.ceil(total / limit),
+      },
+    };
   }
 
   findOne(id: number) {
     return this.prisma.jewelry.findUniqueOrThrow({
       where: {
-        id
-      }
+        id,
+      },
+      
+      include: {
+        medias: mediaOrder,
+      },
+    });
+  }
+
+  findBySlug(slug: string) {
+    return this.prisma.jewelry.findUniqueOrThrow({
+      where: {
+        slug,
+      },
+      include: {
+        medias: mediaOrder,
+        collection: true,
+      },
     });
   }
 
   update(id: number, updateJewelryDto: UpdateJewelryDto) {
-    return `This action updates a #${id} jewelry`;
+    return this.prisma.jewelry.update({
+      where: {
+        id,
+      },
+      
+      data: {
+        name: updateJewelryDto.name,
+        price: updateJewelryDto.price,
+        description: updateJewelryDto.description,
+        material: updateJewelryDto.material,
+        stone: updateJewelryDto.stone,
+        status: updateJewelryDto.status,
+        type: updateJewelryDto.type,
+        slug: updateJewelryDto.slug,
+        medias: updateJewelryDto.medias
+          ? {
+              deleteMany: {},
+              create: updateJewelryDto.medias.map((media) => ({
+                url: media.url,
+                type: media.type,
+                isThumbnail: media.isThumbnail ?? false,
+                sortOrder: media.sortOrder ?? 0,
+              })),
+            }
+          : undefined,
+      },
+      include: {
+        medias: mediaOrder,
+      },
+    });
   }
 
   remove(id: number) {
     return this.prisma.jewelry.update({
       where: {
-        id
+        id,
       },
       data: {
-        status: "HIDDEN"
-      }
-    })
+        status: 'HIDDEN',
+      },
+    });
   }
 }

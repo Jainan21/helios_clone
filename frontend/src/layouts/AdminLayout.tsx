@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 
 const navItems = [
   { label: 'Dashboard', to: '/admin' },
@@ -9,7 +9,7 @@ const navItems = [
 export default function AdminLayout() {
   return (
     <div className="min-h-screen bg-white text-black">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto w-[90%] px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
           <aside className="rounded-4xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm shadow-zinc-100">
             <div className="mb-8 space-y-2">
@@ -34,6 +34,14 @@ export default function AdminLayout() {
                 </NavLink>
               ))}
             </nav>
+            <div className="mt-8 border-t border-zinc-200 pt-4">
+              <Link
+                to="/"
+                className="block rounded-3xl border border-zinc-200 bg-white px-5 py-4 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100"
+              >
+                Back to web page
+              </Link>
+            </div>
           </aside>
 
           <main>

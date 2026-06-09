@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 type Product = {
   id: number;
   name: string;
@@ -32,8 +34,9 @@ export default function ProductGrid({ products }: { products: Product[] }) {
     <div className="w-full bg-black p-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {products.map((product) => (
-          <div
+          <Link
             key={product.id}
+            to={`/products/${product.slug}`}
             className="group cursor-pointer text-white"
           >
 
@@ -67,7 +70,7 @@ export default function ProductGrid({ products }: { products: Product[] }) {
                 {formatPrice(product.price)}
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
