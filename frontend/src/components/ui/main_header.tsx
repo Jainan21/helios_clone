@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ChevronDown, Search, ShoppingBasket } from 'lucide-react'
+import { Search, ShoppingBasket } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage, type Language } from '@/context/LanguageContext'
@@ -42,6 +42,12 @@ const languages: Array<{ value: Language; labelKey: string }> = [
   { value: 'vi', labelKey: 'vietnamese' },
 ]
 
+const discoverItems = [
+  { labelKey: 'aboutHelios', to: '/about-helios' },
+  { labelKey: 'collections', to: '/collections' },
+  { labelKey: 'worldOfHelios', to: '/world-of-helios' },
+]
+
 export default function MainHeader() {
   const { user } = useAuth()
   const { language, setLanguage, t } = useLanguage()
@@ -67,13 +73,12 @@ export default function MainHeader() {
     <div className="group/header relative flex w-full items-center p-7 text-white transition-all duration-400 ease-out hover:bg-black">
       <div className="flex gap-4">
         <div className="group/menu relative flex items-center">
-          <button type="button" className="flex items-center gap-1 text-sm font-medium uppercase">
+          <button type="button" className="flex items-center text-sm font-medium uppercase">
             {t('menu')}
-            <ChevronDown className="size-4" />
           </button>
 
-          <div className="invisible absolute left-0 top-full z-50 w-190 translate-y-4 border border-zinc-800 bg-black/95 p-6 opacity-0 shadow-2xl shadow-black transition group-hover/menu:visible group-hover/menu:translate-y-0 group-hover/menu:opacity-100">
-            <div className="grid grid-cols-3 gap-6">
+          <div className="invisible fixed left-0 top-[104px] z-50 w-screen translate-y-4 border border-zinc-800 bg-black/95 p-6 opacity-0 shadow-2xl shadow-black transition group-hover/menu:visible group-hover/menu:translate-y-0 group-hover/menu:opacity-100">
+            <div className="mx-auto grid w-[90%] grid-cols-3 gap-6">
               {menuGroups.map((group) => (
                 <div key={group.titleKey} className="space-y-4">
                   <h3 className="border-b border-zinc-800 pb-3 text-sm font-semibold uppercase tracking-[0.25em] text-amber-400">
@@ -105,9 +110,25 @@ export default function MainHeader() {
         <span className="flex items-center text-sm font-medium uppercase">
           {t('collab')}
         </span>
-        <span className="flex items-center text-sm font-medium uppercase">
-          {t('discover')}
-        </span>
+        <div className="group/discover relative flex items-center">
+          <button type="button" className="flex items-center text-sm font-medium uppercase">
+            {t('discover')}
+          </button>
+
+          <div className="invisible absolute left-0 top-full z-50 w-64 translate-y-4 border border-zinc-800 bg-black/95 p-3 opacity-0 shadow-2xl shadow-black transition group-hover/discover:visible group-hover/discover:translate-y-0 group-hover/discover:opacity-100">
+            <div className="grid gap-1">
+              {discoverItems.map((item) => (
+                <Link
+                  key={item.labelKey}
+                  to={item.to}
+                  className="border-b border-zinc-900 px-4 py-3 text-sm font-medium uppercase tracking-[0.18em] text-zinc-300 transition last:border-b-0 hover:bg-zinc-900 hover:text-amber-400"
+                >
+                  {t(item.labelKey)}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="absolute left-1/2 -translate-x-1/2">
@@ -122,9 +143,8 @@ export default function MainHeader() {
           onMouseEnter={() => setIsLanguageOpen(true)}
           onMouseLeave={() => setIsLanguageOpen(false)}
         >
-          <button type="button" className="flex items-center gap-2" onClick={() => setIsLanguageOpen((current) => !current)}>
+          <button type="button" className="flex items-center" onClick={() => setIsLanguageOpen((current) => !current)}>
             <span>{language === 'en' ? t('english') : t('vietnamese')}</span>
-            <ChevronDown />
           </button>
           <div
             className={`absolute right-0 top-full z-50 w-40 border border-zinc-800 bg-black/95 p-2 shadow-xl shadow-black transition ${

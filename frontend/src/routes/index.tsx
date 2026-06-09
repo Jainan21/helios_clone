@@ -3,6 +3,9 @@ import HomePage from '@/pages/HomePage'
 import ProductDetailPage from '@/pages/ProductDetailPage'
 import ProductsPage from '@/pages/ProductsPage'
 import CollectionDetailPage from '@/pages/CollectionDetailPage'
+import CollectionsPage from '@/pages/CollectionsPage'
+import AboutHeliosPage from '@/pages/AboutHeliosPage'
+import WorldOfHeliosPage from '@/pages/WorldOfHeliosPage'
 import LoginPage from '@/pages/LoginPage'
 import RegisterPage from '@/pages/RegisterPage'
 import CartPage from '@/pages/CartPage'
@@ -30,6 +33,18 @@ export const router = createBrowserRouter([
   {
     path: '/collections/:id',
     element: <CollectionDetailPage />,
+  },
+  {
+    path: '/collections',
+    element: <CollectionsPage />,
+  },
+  {
+    path: '/about-helios',
+    element: <AboutHeliosPage />,
+  },
+  {
+    path: '/world-of-helios',
+    element: <WorldOfHeliosPage />,
   },
   {
     path: '/login',
