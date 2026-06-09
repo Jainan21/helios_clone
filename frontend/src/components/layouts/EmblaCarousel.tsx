@@ -41,8 +41,10 @@ export function EmblaCarousel() {
         const tick = (now: number) => {
             const elapsed = now - start
             const pct = Math.min((elapsed / SLIDE_DURATION) * 100, 100)
+
             setProgress(pct)
-            if (elapsed < SLIDE_DURATION) {
+
+            if (pct < 100) {
                 requestAnimationFrame(tick)
             }
         }
@@ -57,35 +59,71 @@ export function EmblaCarousel() {
     }
 
     return (
-        <div className="relative w-full overflow-hidden h-screen">
+        <div className="relative w-full overflow-hidden h-225">
             {/* Viewport */}
             <div ref={emblaRef} className="overflow-hidden">
                 <div className="flex">
                     {slides.map((src, i) => (
-                        <div key={i} className="flex-[0_0_100%] min-w-0">
-                            <img src={src} alt={`Slide ${i + 1}`} className="w-full object-cover" />
+                        <div key={i} className="flex-[0_0_100%] min-w-0 relative">
+                            <img src={src} alt={`Slide ${i + 1}`} className="w-full object-cover transition-all duration-1400 ease-out scale-100 group-hover:scale-[1.02]" />
                         </div>
                     ))}
                 </div>
             </div>
 
             {/* Bottom controls */}
-            <div className="absolute bottom-0 left-0 right-0 px-6 pb-4  gap-2">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
+                {Array.from({ length: slideCount }).map((_, i) => {
+                    const active = i === selectedIndex
 
-                {/* Dot indicators */}
-                <div className="flex justify-center gap-2">
-                    {Array.from({ length: slideCount }).map((_, i) => (
+                    const radius = 7
+                    const circumference = 2 * Math.PI * radius
+
+                    return (
                         <button
                             key={i}
                             onClick={() => goTo(i)}
-                            className={`rounded-full transition-all duration-300 ${
-                                i === selectedIndex
-                                    ? 'w-2 h-2 bg-white'
-                                    : 'w-2 h-2 bg-white/50 hover:bg-white/80'
-                            }`}
-                        />
-                    ))}
-                </div>
+                            className="relative flex items-center justify-center w-6 h-6 transition-transform duration-300"
+                        >
+                            {/* inactive dot */}
+                            {!active && (
+                                <div className="w-2 h-2 rounded-full bg-white/90" />
+                            )}
+
+                            {/* active progress ring */}
+                            {active && (
+                                <svg
+                                    className="absolute inset-0 -rotate-90"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r={radius}
+                                        fill="none"
+                                        stroke="rgba(255,255,255,0.25)"
+                                        strokeWidth="2"
+                                    />
+
+                                    <circle
+                                        cx="12"
+                                        cy="12"
+                                        r={radius}
+                                        fill="none"
+                                        stroke="white"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeDasharray={circumference}
+                                        strokeDashoffset={
+                                            circumference - (circumference * progress) / 100
+                                        }
+                                        className="transition-all duration-75 linear"
+                                    />
+                                </svg>
+                            )}
+                        </button>
+                    )
+                })}
             </div>
         </div>
     )
