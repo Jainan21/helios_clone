@@ -4,6 +4,7 @@ import App from './App'
 import { AuthProvider } from '@/context/AuthContext'
 import { JewelryProvider } from '@/context/JewelryContext'
 import { LanguageProvider } from '@/context/LanguageContext'
+import { CollectionProvider } from '@/context/CollectionContext'
 import './index.css'
 
 const queryClient = new QueryClient()
@@ -13,7 +14,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <LanguageProvider>
       <AuthProvider>
         <JewelryProvider>
-          <App />
+          <CollectionProvider>
+            <App />
+          </CollectionProvider>
         </JewelryProvider>
       </AuthProvider>
     </LanguageProvider>

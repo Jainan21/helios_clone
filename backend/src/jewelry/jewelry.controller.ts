@@ -25,6 +25,7 @@ export class JewelryController {
     @Query('status') status?: string,
     @Query('type') type?: string,
     @Query('search') search?: string,
+    @Query('collection') collection?: string,
     @Query('page') page = '1',
     @Query('limit') limit = '20',
   ) {
@@ -32,6 +33,7 @@ export class JewelryController {
       status,
       type,
       search,
+      collection,
       page: Number(page),
       limit: Number(limit),
     });

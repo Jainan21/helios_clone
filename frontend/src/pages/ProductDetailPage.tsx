@@ -107,9 +107,9 @@ export default function ProductDetailPage() {
               <div className="space-y-4">
                 <div className="overflow-hidden bg-neutral-900">
                   {selectedImage ? (
-                    <img src={selectedImage} alt={item.name} className="h-[72vh] min-h-[520px] w-full object-cover" />
+                    <img src={selectedImage} alt={item.name} className="h-[72vh] min-h-130 w-full object-cover" />
                   ) : (
-                    <div className="flex h-[72vh] min-h-[520px] items-center justify-center text-zinc-500">
+                    <div className="flex h-[72vh] min-h-130 items-center justify-center text-zinc-500">
                       No image
                     </div>
                   )}

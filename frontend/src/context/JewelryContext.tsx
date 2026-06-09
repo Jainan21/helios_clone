@@ -33,6 +33,7 @@ export type JewelryItem = {
   status: JewelryStatus
   type: JewelryType
   slug: string
+  collectionId?: number | null
   medias?: JewelryMedia[]
 }
 
@@ -45,6 +46,7 @@ export type CreateJewelryPayload = {
   status?: JewelryStatus
   type?: JewelryType
   slug: string
+  collectionId?: number
   medias?: Omit<JewelryMedia, 'id'>[]
 }
 
@@ -54,6 +56,7 @@ export type GetJewelryParams = {
   status?: JewelryStatus
   type?: JewelryType
   search?: string
+  collection?: 'unassigned'
   page?: number
   limit?: number
 }

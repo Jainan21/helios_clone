@@ -1,22 +1,62 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useContext, useMemo, useState } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
+import { Link } from 'react-router-dom'
+import { CollectionContext, type CollectionItem } from '@/context/CollectionContext'
 
 
 const SLIDE_DURATION = 5000
 
 export function EmblaCarousel() {
+    const { getCollections } = useContext(CollectionContext)
     const autoplay = Autoplay({ delay: SLIDE_DURATION, stopOnInteraction: false })
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [autoplay])
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [progress, setProgress] = useState(0)
     const [slideCount, setSlideCount] = useState(0)
+    const [collections, setCollections] = useState<CollectionItem[]>([])
 
-    const slides = [
-        "../src/assets/Landingpage_pc_01_1ce72cc9-426e-4a68-941f-0f3f1ecf134f-done.webp",
-        "../src/assets/file_thiet_ke_nhan_Polaris_Voyage_v2_19x9_31129b03-7322-472f-8ce0-d576c23560c5.webp",
-        "../src/assets/Landingpage_pc_01_1ce72cc9-426e-4a68-941f-0f3f1ecf134f-done.webp",
-    ]
+    const slides = useMemo(
+        () =>
+            collections
+                .map((collection) => {
+                    const sortedMedia = [...(collection.medias ?? [])].sort(
+                        (first, second) => (first.sortOrder ?? 0) - (second.sortOrder ?? 0),
+                    )
+                    const media = sortedMedia.find((item) => item.isThumbnail) ?? sortedMedia[0]
+
+                    if (!media) {
+                        return null
+                    }
+
+                    return {
+                        id: collection.id,
+                        name: collection.name,
+                        description: collection.description,
+                        src: media.url,
+                    }
+                })
+                .filter((slide): slide is { id: number; name: string; description: string; src: string } => Boolean(slide)),
+        [collections],
+    )
+
+    useEffect(() => {
+        let isMounted = true
+
+        getCollections({ page: 1, limit: 3 })
+            .then((response) => {
+                if (isMounted) {
+                    setCollections(response.data)
+                }
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+
+        return () => {
+            isMounted = false
+        }
+    }, [getCollections])
 
     // Sync selected index
     const onSelect = useCallback(() => {
@@ -31,7 +71,7 @@ export function EmblaCarousel() {
         emblaApi.on('select', onSelect)
         onSelect()
         return () => { emblaApi.off('select', onSelect) }
-    }, [emblaApi, onSelect])
+    }, [emblaApi, onSelect, slides.length])
 
     // Progress bar ticker
     useEffect(() => {
@@ -63,10 +103,20 @@ export function EmblaCarousel() {
             {/* Viewport */}
             <div ref={emblaRef} className="overflow-hidden">
                 <div className="flex">
-                    {slides.map((src, i) => (
-                        <div key={i} className="flex-[0_0_100%] min-w-0 relative">
-                            <img src={src} alt={`Slide ${i + 1}`} className="w-full object-cover transition-all duration-1400 ease-out scale-100 group-hover:scale-[1.02]" />
+                    {slides.length === 0 ? (
+                        <div className="flex h-225 flex-[0_0_100%] min-w-0 items-center justify-center bg-zinc-950 text-sm uppercase tracking-[0.35em] text-white/60">
+                            Collections
                         </div>
+                    ) : null}
+
+                    {slides.map((slide, i) => (
+                        <Link key={slide.id} to={`/collections/${slide.id}`} className="group flex-[0_0_100%] min-w-0 relative">
+                            <img src={slide.src} alt={slide.name || `Collection ${i + 1}`} className="h-225 w-full object-cover transition-all duration-1400 ease-out scale-100 group-hover:scale-[1.02]" />
+                            <div className="absolute bottom-16 left-6 max-w-xl text-white sm:left-10 lg:left-16">
+                                <h2 className="text-3xl font-semibold uppercase tracking-wide sm:text-5xl">{slide.name}</h2>
+                                <p className="mt-3 max-w-lg text-sm leading-6 text-white/85 sm:text-base">{slide.description}</p>
+                            </div>
+                        </Link>
                     ))}
                 </div>
             </div>

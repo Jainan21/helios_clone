@@ -74,6 +74,10 @@ export class CreateJewelryDto {
     slug: string
 
     @IsOptional()
+    @IsInt()
+    collectionId?: number
+
+    @IsOptional()
     @IsArray()
     @ValidateNested({each: true})
     @Type(()=>CreateMediaDto)

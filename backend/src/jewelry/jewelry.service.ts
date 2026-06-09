@@ -42,6 +42,7 @@ export class JewelryService {
         status: dto.status,
         type: dto.type,
         slug: dto.slug,
+        collectionId: dto.collectionId,
         medias: dto.medias
           ? {
               create: dto.medias.map((media) => ({
@@ -90,10 +91,11 @@ export class JewelryService {
     status?: string;
     type?: string;
     search?: string;
+    collection?: string;
     page: number;
     limit: number;
   }) {
-    const { status, type, search, page, limit } = params;
+    const { status, type, search, collection, page, limit } = params;
     const skip = (page - 1) * limit;
     const where: any = {
       status: {
@@ -116,6 +118,10 @@ export class JewelryService {
       };
     }
 
+    if (collection === 'unassigned') {
+      where.collectionId = null;
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.jewelry.findMany({
         where,
@@ -129,6 +135,7 @@ export class JewelryService {
           status: true,
           type: true,
           slug: true,
+          collectionId: true,
           medias: {
             select: {
               id: true,
@@ -203,6 +210,7 @@ export class JewelryService {
         status: updateJewelryDto.status,
         type: updateJewelryDto.type,
         slug: updateJewelryDto.slug,
+        collectionId: updateJewelryDto.collectionId,
         medias: updateJewelryDto.medias
           ? {
               deleteMany: {},
