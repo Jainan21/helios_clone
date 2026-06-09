@@ -72,7 +72,7 @@ export default function MainHeader() {
             <ChevronDown className="size-4" />
           </button>
 
-          <div className="invisible absolute left-0 top-full z-50 w-[760px] translate-y-4 border border-zinc-800 bg-black/95 p-6 opacity-0 shadow-2xl shadow-black transition group-hover/menu:visible group-hover/menu:translate-y-0 group-hover/menu:opacity-100">
+          <div className="invisible absolute left-0 top-full z-50 w-190 translate-y-4 border border-zinc-800 bg-black/95 p-6 opacity-0 shadow-2xl shadow-black transition group-hover/menu:visible group-hover/menu:translate-y-0 group-hover/menu:opacity-100">
             <div className="grid grid-cols-3 gap-6">
               {menuGroups.map((group) => (
                 <div key={group.titleKey} className="space-y-4">
